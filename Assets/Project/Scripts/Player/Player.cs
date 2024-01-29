@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class Player : MonoBehaviour
@@ -28,6 +29,7 @@ public class Player : MonoBehaviour
     [SerializeField, Tooltip("인격을 변경딜레이 시간")] private float personalityDelay; //인격 변경을 위한 딜레이 타임
     private bool personalityChangeOff = false;
     private float personalityDelayTimer; //인격 변경을 위한 딜레이 타이머
+    private bool useCnagePersonality = false;
     [SerializeField, Tooltip("인격을 변경 중 무적 시간")] private float personalityInvincibilityTimer; //인격 변경 시 무적 시간
 
     private Animator animJames; //제임스의 애니메이션
@@ -54,6 +56,8 @@ public class Player : MonoBehaviour
     private bool doubleJumpTimerOn = false; //더블 점프를 하기 위한 타이머를 작동시키는 변수
     private float doubleJumpDelay; //더블 점프를 하기 위한 딜레이 시간
     private bool jumpAnim = false; //점프 애니메이션을 실행시키기 위한 변수
+    private bool isDrop = false; //떨어지는 지를 체크하여 애니메이션을 실행하기 위한 변수
+    private float dropTimer; //드랍 애니메이션으로 전환하기 위한 변수
 
     [Header("플레이어 대쉬 설정")]
     [SerializeField, Tooltip("플레이어의 대쉬 힘")] private float playerDashPower;
@@ -113,6 +117,7 @@ public class Player : MonoBehaviour
             {
                 float randomTimer = Random.Range(changeTypeMin, changeTypeMax);
                 personalityChangeTimer = randomTimer;
+                useCnagePersonality = true;
                 personalityChangeOff = true;
                 isPersonality = true;
             }
@@ -158,6 +163,16 @@ public class Player : MonoBehaviour
                 dashDurationTimerOn = false;
             }
         }
+
+        if (jumpAnim == true && isGround == false)
+        {
+            dropTimer += Time.deltaTime;
+            if (dropTimer >= 0.3f)
+            {
+                jumpAnim = false;
+                dropTimer = 0f;
+            }
+        }
     }
 
     /// <summary>
@@ -184,6 +199,7 @@ public class Player : MonoBehaviour
             isDoubleJump = false; //박스케스트에 닿은 오브젝트가 Ground레이어면 더블점프 체크 
             doubleJumpTimerOn = false; //박스케스트에 닿은 오브젝트가 Ground레이어면 더블점프 타이머 체크 
             jumpAnim = false; //박스케스트에 닿은 오브젝트가 Ground레이어면 점프 애니메이션 체크 
+            isDrop = false; //땅에 있을 때 드랍 애니메이션을 false 만들어 줌
         }
     }
 
@@ -253,6 +269,7 @@ public class Player : MonoBehaviour
                 gravityVelocity = playerJumpPower;
                 doubleJumpTimerOn = true;
                 jumpAnim = true;
+                isDrop = false;
             }
             else if (isGround == false && isJump == false && isDoubleJump == true)
             {
@@ -260,6 +277,7 @@ public class Player : MonoBehaviour
                 isJump = true;
                 isDoubleJump = false;
                 jumpAnim = true;
+                isDrop = false;
             }
         }
     }
@@ -277,6 +295,8 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftShift) && dashCoolTimerOn == false)
         {
             isDash = true;
+
+            isDrop = false;
 
             dashDurationTimerOn = true;
 
@@ -313,6 +333,15 @@ public class Player : MonoBehaviour
             {
                 gravityVelocity = gravity;
             }
+
+            if (jumpAnim == false)
+            {
+                isDrop = true;
+            }
+            else if (jumpAnim == true)
+            {
+                isDrop = false;
+            }
         }
         else
         {
@@ -330,12 +359,21 @@ public class Player : MonoBehaviour
     /// </summary>
     private void playerPersonalityChange()
     {
-        if (isPersonality == true && personalityChangeOff == false)
+        if (useCnagePersonality == true)
         {
             if (james.activeSelf == true) //제임스 오브젝트가 활성화중이면 헨리와 로렌 중 랜덤 활성화
             {
                 int ranPersonality = Random.Range(1, 3);
                 randomPersonality = ranPersonality;
+
+                if (ranPersonality == 1)
+                {
+                    animJames.SetTrigger("Henry");
+                }
+                else if (ranPersonality == 2)
+                {
+                    animJames.SetTrigger("Lauren");
+                }
             }
             else if (henry.activeSelf == true) //헨리 오브젝트가 활성화중이면 제임스와 로렌 중 랜덤 활성화
             {
@@ -343,18 +381,33 @@ public class Player : MonoBehaviour
                 if (ranPersonality == 0)
                 {
                     randomPersonality = 0;
+                    animHenry.SetTrigger("James");
                 }
                 else if (ranPersonality == 1)
                 {
                     randomPersonality = 2;
+                    animHenry.SetTrigger("Lauren");
                 }
             }
             else if (lauren.activeSelf == true) //로렌 오브젝트가 활성화중이면 제임스와 헨리 중 랜덤 활성화
             {
                 int ranPersonality = Random.Range(0, 2);
                 randomPersonality = ranPersonality;
-            }
 
+                if (ranPersonality == 0)
+                {
+                    animLauren.SetTrigger("James");
+                }
+                else if (ranPersonality == 1)
+                {
+                    animLauren.SetTrigger("Henry");
+                }
+            }
+            useCnagePersonality = false;
+        }
+
+        if (isPersonality == true && personalityChangeOff == false)
+        {         
             if (randomPersonality == 0 && james.activeSelf == false)
             {
                 henry.SetActive(false);
@@ -431,6 +484,8 @@ public class Player : MonoBehaviour
             animJames.SetBool("isJump", jumpAnim);
             animJames.SetBool("isGround", isGround);
             animJames.SetBool("isDash", isDash);
+            animJames.SetBool("isDrop", isDrop);
+            animJames.SetBool("isChage", isPersonality);
         }
         else if (henry.activeSelf == true)
         {
@@ -439,6 +494,8 @@ public class Player : MonoBehaviour
             animHenry.SetBool("isJump", jumpAnim);
             animHenry.SetBool("isGround", isGround);
             animHenry.SetBool("isDash", isDash);
+            animHenry.SetBool("isDrop", isDrop);
+            animHenry.SetBool("isChage", isPersonality);
         }
         else if (lauren.activeSelf == true)
         {
@@ -447,6 +504,8 @@ public class Player : MonoBehaviour
             animLauren.SetBool("isJump", jumpAnim);
             animLauren.SetBool("isGround", isGround);
             animLauren.SetBool("isDash", isDash);
+            animLauren.SetBool("isDrop", isDrop);
+            animLauren.SetBool("isChage", isPersonality);
         }
     }
 }
