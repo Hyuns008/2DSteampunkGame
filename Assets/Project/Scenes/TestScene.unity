@@ -1003,6 +1003,7 @@ GameObject:
   - component: {fileID: 898185422}
   - component: {fileID: 898185421}
   - component: {fileID: 898185425}
+  - component: {fileID: 898185426}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1097,7 +1098,7 @@ Camera:
   far clip plane: 1000
   field of view: 55
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 5.4
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -1142,6 +1143,30 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cameraSpeed: 3
   player: {fileID: 919075258}
+--- !u!114 &898185426
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 898185420}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c88f5cead0c0b2a4eb05b5900433f8d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_ComponentVersion: 1
+  m_AssetsPPU: 100
+  m_RefResolutionX: 1920
+  m_RefResolutionY: 1080
+  m_CropFrame: 0
+  m_GridSnapping: 0
+  m_FilterMode: 0
+  m_UpscaleRT: 0
+  m_PixelSnapping: 0
+  m_CropFrameX: 0
+  m_CropFrameY: 0
+  m_StretchFill: 0
 --- !u!1 &919075258 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 2521401415160499158, guid: 32e248bc631fd154e8ccb1fa37908aef, type: 3}
@@ -1475,14 +1500,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 173037271011116777, guid: 32e248bc631fd154e8ccb1fa37908aef, type: 3}
-      propertyPath: m_Size.x
-      value: 0.54410434
-      objectReference: {fileID: 0}
-    - target: {fileID: 173037271011116777, guid: 32e248bc631fd154e8ccb1fa37908aef, type: 3}
-      propertyPath: m_Offset.x
-      value: 0.021618843
-      objectReference: {fileID: 0}
     - target: {fileID: 985574215181912451, guid: 32e248bc631fd154e8ccb1fa37908aef, type: 3}
       propertyPath: m_RootOrder
       value: 1
@@ -1531,21 +1548,9 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 8493938975701488046, guid: 32e248bc631fd154e8ccb1fa37908aef, type: 3}
+    - target: {fileID: 6567264554621500328, guid: 32e248bc631fd154e8ccb1fa37908aef, type: 3}
       propertyPath: m_IsActive
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9068838623171900539, guid: 32e248bc631fd154e8ccb1fa37908aef, type: 3}
-      propertyPath: gravity
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 9068838623171900539, guid: 32e248bc631fd154e8ccb1fa37908aef, type: 3}
-      propertyPath: playerJumpPower
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 9068838623171900539, guid: 32e248bc631fd154e8ccb1fa37908aef, type: 3}
-      propertyPath: playerMoveSpeed
-      value: 4
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
