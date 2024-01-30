@@ -637,6 +637,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 9068838623171900539, guid: 32e248bc631fd154e8ccb1fa37908aef, type: 3}
+      propertyPath: personalityDelay
+      value: 1.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 9068838623171900539, guid: 32e248bc631fd154e8ccb1fa37908aef, type: 3}
+      propertyPath: personalityInvincibilityTimer
+      value: 2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
