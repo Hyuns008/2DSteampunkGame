@@ -39,6 +39,12 @@ public class Monster : MonoBehaviour
             rigid.velocity = moveVec;
             return;
         }
+        else
+        {
+            moveVec.x = moveSpeed;
+            moveVec.y = rigid.velocity.y;
+            rigid.velocity = moveVec;
+        }
 
         if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
         {
@@ -46,7 +52,7 @@ public class Monster : MonoBehaviour
 
             Vector3 playerPos = collision.transform.position - transform.position;
 
-            if (playerPos.x < -1 && transform.localScale.x < 0)
+            if (playerPos.x < -1f && transform.localScale.x < 0)
             {
                 moveSpeed *= -1;
 
@@ -56,7 +62,7 @@ public class Monster : MonoBehaviour
 
                 moveVec.x = moveSpeed;
             }
-            else if (playerPos.x > 1 && transform.localScale.x > 0)
+            else if (playerPos.x > 1f && transform.localScale.x > 0)
             {
                 moveSpeed *= -1;
 
@@ -66,7 +72,7 @@ public class Monster : MonoBehaviour
 
                 moveVec.x = moveSpeed;
             }
-            else if(playerPos.x >= -1 && playerPos.x <= 1)
+            else if(playerPos.x >= -1f && playerPos.x <= 1f)
             {
                 moveVec.x = 0f;
             }
@@ -156,6 +162,12 @@ public class Monster : MonoBehaviour
             moveVec.x = 0f;
             rigid.velocity = moveVec;
             return;
+        }
+        else
+        {
+            moveVec.x = moveSpeed;
+            moveVec.y = rigid.velocity.y;
+            rigid.velocity = moveVec;
         }
 
         if (moveVec.x > 0 && transform.localScale.x > 0)

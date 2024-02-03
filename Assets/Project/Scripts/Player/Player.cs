@@ -35,6 +35,8 @@ public class Player : MonoBehaviour
     private float personalityDelayTimer; //인격 변경을 위한 딜레이 타이머
     private bool useCnagePersonality = false;
     [SerializeField, Tooltip("인격을 변경 중 무적 시간")] private float personalityInviTime; //인격 변경 시 무적 시간
+    private float personalityInviTimer; //인격 변경 시 무적이 지속되는 타이머
+    private bool personalityInvi = false; //인격 변경 시 무적으로 만들어주는 변수
 
     private Animator animJames; //제임스의 애니메이션
     private Animator animHenry; //헨리의 애니메이션
@@ -43,7 +45,6 @@ public class Player : MonoBehaviour
     private Rigidbody2D rigid; //플레이어에 컴포넌트된 리지드바디를 받아올 변수
     private BoxCollider2D playerBoxColl; //플레이어의 박스 콜라이더
     private Vector3 moveVec; //플레이어의 움직임에 값을 받고 넣어줄 벡터 변수
-    private RaycastHit2D hit2D; //땅을 체크하기 위한 레이캐스트
 
     [Header("중력 설정")]
     [SerializeField, Tooltip("플레이어의 중력")] private float gravity;
@@ -77,6 +78,7 @@ public class Player : MonoBehaviour
     private bool dashDurationTimerOn; //대쉬가 지속되는 타이머를 실행시켜주는 변수
     private float dashDurationTimer; //대쉬가 지속되는 타이머
     private bool dashInvi = false; //대쉬 중 무적을 체크해주는 변수
+    private float dashInviTimer; //대쉬 중 무적시간
 
     [Header("플레이어 히트 설정")]
     [SerializeField, Tooltip("맞을 시 다시 맞는 딜레이 시간")] private float hitTime;
@@ -170,6 +172,16 @@ public class Player : MonoBehaviour
             }
         }
 
+        if (personalityInvi == true)
+        {
+            personalityInviTimer += Time.deltaTime;
+            if (personalityInviTimer >= personalityInviTime)
+            {
+                personalityInviTimer = 0f;
+                personalityInvi = false;
+            }
+        }
+
         if (doubleJumpTimerOn == true && isJump == false) //더블점프를 하기 위한 타이머
         {
             doubleJumpDelay += Time.deltaTime;
@@ -196,9 +208,18 @@ public class Player : MonoBehaviour
             if (dashDurationTimer >= dashDuration)
             {
                 isDash = false;
-                dashInvi = false;
                 dashDurationTimer = 0.0f;
                 dashDurationTimerOn = false;
+            }
+        }
+
+        if (dashInvi == true)
+        {
+            dashInviTimer += Time.deltaTime;
+            if (dashInviTimer >= 0.5f)
+            {
+                dashInviTimer = 0f;
+                dashInvi = false;
             }
         }
 
@@ -215,7 +236,8 @@ public class Player : MonoBehaviour
         if (isHit == true)
         {
             hitDelayTimer += Time.deltaTime;
-            if (hitDelayTimer >= hitTime)
+
+            if (hitDelayTimer >= 0.2f && hitDelayTimer < hitTime)
             {
                 if (james.activeSelf == true)
                 {
@@ -229,7 +251,9 @@ public class Player : MonoBehaviour
                 {
                     sprRen[2].color = Color.white;
                 }
-
+            }
+            else if (hitDelayTimer >= hitTime)
+            {
                 hitDelayTimer = 0f;
                 isHit = false;
             }
@@ -464,7 +488,10 @@ public class Player : MonoBehaviour
                     animLauren.SetTrigger("Henry");
                 }
             }
+
             useCnagePersonality = false;
+
+            personalityInvi = true;
         }
 
         if (isPersonality == true && personalityChangeOff == false)
@@ -474,6 +501,7 @@ public class Player : MonoBehaviour
                 henry.SetActive(false);
                 lauren.SetActive(false);
                 james.SetActive(true);
+                sprRen[0].color = Color.white;
                 personality = 0;
                 isPersonality = false;
             }
@@ -482,6 +510,7 @@ public class Player : MonoBehaviour
                 james.SetActive(false);
                 lauren.SetActive(false);
                 henry.SetActive(true);
+                sprRen[1].color = Color.white;
                 personality = 1;
                 isPersonality = false;
             }
@@ -490,6 +519,7 @@ public class Player : MonoBehaviour
                 henry.SetActive(false);
                 james.SetActive(false);
                 lauren.SetActive(true);
+                sprRen[2].color = Color.white;
                 personality = 2;
                 isPersonality = false;
             }
@@ -578,51 +608,54 @@ public class Player : MonoBehaviour
     /// </summary>
     public void PlayerHit(float _damge, bool _isHit, bool _isFire)
     {
-        if (dashInvi == false && isHit == false)
+        if (dashInvi == true || isHit == true || personalityInvi == true)
         {
-            isHit = _isHit;
+            return;
+        }
 
-            if (james.activeSelf == true)
+        isHit = _isHit;
+
+        curHp -= _damge;
+
+        if (james.activeSelf == true)
+        {
+            if (_isFire == true)
             {
-                if (_isFire == true)
-                {
-                    sprRen[0].color = Color.red;
-                }
-                else if (_isFire == false)
-                {
-
-                }
-
-                animJames.SetTrigger("isHit");
+                sprRen[0].color = Color.red;
             }
-            else if (henry.activeSelf == true)
+            else if (_isFire == false)
             {
-                if (_isFire == true)
-                {
-                    sprRen[1].color = Color.red;
-                }
-                else if (_isFire == false)
-                {
 
-                }
-
-                animHenry.SetTrigger("isHit");
-            }
-            else if (lauren.activeSelf == true)
-            {
-                if (_isFire == true)
-                {
-                    sprRen[2].color = Color.red;
-                }
-                else if (_isFire == false)
-                {
-
-                }
-
-                animLauren.SetTrigger("isHit");
             }
 
-            curHp -= _damge;
+            animJames.SetTrigger("isHit");
+        }
+        else if (henry.activeSelf == true)
+        {
+            if (_isFire == true)
+            {
+                sprRen[1].color = Color.red;
+            }
+            else if (_isFire == false)
+            {
+
+            }
+
+            animHenry.SetTrigger("isHit");
+        }
+        else if (lauren.activeSelf == true)
+        {
+            if (_isFire == true)
+            {
+                sprRen[2].color = Color.red;
+            }
+            else if (_isFire == false)
+            {
+
+            }
+
+            animLauren.SetTrigger("isHit");
         }
     }
 }
+
