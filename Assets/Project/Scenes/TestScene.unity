@@ -1875,10 +1875,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: Slime
       objectReference: {fileID: 0}
-    - target: {fileID: 7844107729464034678, guid: 2af15d1e2a66eca4693f02215c365654, type: 3}
-      propertyPath: attackTime
-      value: 2.2
-      objectReference: {fileID: 0}
     - target: {fileID: 8627168225990132810, guid: 2af15d1e2a66eca4693f02215c365654, type: 3}
       propertyPath: m_RootOrder
       value: 3

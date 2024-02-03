@@ -12,9 +12,9 @@ public class Slime : MonoBehaviour
     [Header("슬라임 기본 설정")]
     [SerializeField, Tooltip("공격 지속 시간")] private float attackTime;
     [SerializeField, Tooltip("화염방사 재사용대기시간")] private float fireCoolTime;
-    [SerializeField] private float fireCoolTimer; //화염방사 쿨타이머
-    [SerializeField] private bool useFireShot = false; //화염방사를 사용했는지 체크하기 위한 변수
-    [SerializeField] private bool createFireShot = false; //화염을 생성했는지 체크하기 위한 변수
+    private float fireCoolTimer; //화염방사 쿨타이머
+    private bool useFireShot = false; //화염방사를 사용했는지 체크하기 위한 변수
+    private bool createFireShot = false; //화염을 생성했는지 체크하기 위한 변수
 
     [Header("체크 콜라이더 설정")]
     [SerializeField] private CircleCollider2D checkColl;
@@ -23,9 +23,9 @@ public class Slime : MonoBehaviour
     [SerializeField, Tooltip("공격 프리팹")] private GameObject attackPrefab;
     [SerializeField, Tooltip("공격 프리팹이 생성될 위치")] private Transform attackTrs;
 
-    [SerializeField] private bool isAttack; //공격을 했는지 체크하기 위한 변수
-    [SerializeField] private bool attackContinuing = false; //공격을 지속중인지 체크
-    [SerializeField] private float continueTimer; //공격 지속 시간
+    private bool isAttack; //공격을 했는지 체크하기 위한 변수
+    private bool attackContinuing = false; //공격을 지속중인지 체크
+    private float continueTimer; //공격 지속 시간
 
     private void onTriggerCheck(Collider2D collision)
     {

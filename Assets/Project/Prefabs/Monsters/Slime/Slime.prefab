@@ -207,11 +207,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 92c2b3b3ed1fb834e91f8fd2f23c3d77, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  attackTime: 2
+  attackTime: 2.2
   fireCoolTime: 5
+  fireCoolTimer: 0
+  useFireShot: 0
+  createFireShot: 0
   checkColl: {fileID: 2166527571057448157}
   attackPrefab: {fileID: 1696467024699466353, guid: d574c530c46dd4a4aad28a0bb3c3979e, type: 3}
   attackTrs: {fileID: 4767175741271018483}
+  isAttack: 0
+  attackContinuing: 0
+  continueTimer: 0
 --- !u!1 &3466902966398462778
 GameObject:
   m_ObjectHideFlags: 0
