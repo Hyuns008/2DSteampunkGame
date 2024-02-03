@@ -30,7 +30,7 @@ public class Player : MonoBehaviour
     private bool personalityChangeOff = false;
     private float personalityDelayTimer; //인격 변경을 위한 딜레이 타이머
     private bool useCnagePersonality = false;
-    [SerializeField, Tooltip("인격을 변경 중 무적 시간")] private float personalityInvincibilityTimer; //인격 변경 시 무적 시간
+    [SerializeField, Tooltip("인격을 변경 중 무적 시간")] private float InvincibilityTime; //인격 변경 시 무적 시간
 
     private Animator animJames; //제임스의 애니메이션
     private Animator animHenry; //헨리의 애니메이션
@@ -47,10 +47,10 @@ public class Player : MonoBehaviour
     private bool isGround; //땅을 체크하기 위한 변수
 
     [Header("플레이어 이동속도 설정")]
-    [SerializeField, Tooltip("플레이어의 이동속도")] private float playerMoveSpeed;
+    [SerializeField, Tooltip("플레이어의 이동속도")] private float moveSpeed;
 
     [Header("플레이어 점프 설정")]
-    [SerializeField, Tooltip("플레이어의 점프 힘")] private float playerJumpPower;
+    [SerializeField, Tooltip("플레이어의 점프 힘")] private float jumpPower;
     private bool isJump = false; //점프를 했는지 체크하기 위한 변수
     private bool isDoubleJump = false; //점프를 했는지 체크하기 위한 변수
     private bool doubleJumpTimerOn = false; //더블 점프를 하기 위한 타이머를 작동시키는 변수
@@ -60,8 +60,8 @@ public class Player : MonoBehaviour
     private float dropTimer; //드랍 애니메이션으로 전환하기 위한 변수
 
     [Header("플레이어 대쉬 설정")]
-    [SerializeField, Tooltip("플레이어의 대쉬 힘")] private float playerDashPower;
-    [SerializeField, Tooltip("플레이어의 대쉬 쿨타임")] private float playerDashCoolTime;
+    [SerializeField, Tooltip("플레이어의 대쉬 힘")] private float dashPower;
+    [SerializeField, Tooltip("플레이어의 대쉬 쿨타임")] private float dashCoolTime;
     private bool isDash = false; //대쉬를 사용했는지 체크하기 위한 변수
     private bool dashCoolTimerOn = false; //대쉬를 사용 후 쿨타임을 실행시켜주는 변수
     private float dashCoolTimer; //대쉬 쿨 타이머
@@ -84,7 +84,7 @@ public class Player : MonoBehaviour
         playerBoxColl = GetComponent<BoxCollider2D>();
 
         personalityChangeTimer = 300.0f;
-        dashCoolTimer = playerDashCoolTime;
+        dashCoolTimer = dashCoolTime;
     }
 
     private void Start()
@@ -148,7 +148,7 @@ public class Player : MonoBehaviour
             dashCoolTimer -= Time.deltaTime;
             if (dashCoolTimer <= 0.0f)
             {
-                dashCoolTimer = playerDashCoolTime;
+                dashCoolTimer = dashCoolTime;
                 dashCoolTimerOn = false;
             }
         }
@@ -180,21 +180,19 @@ public class Player : MonoBehaviour
     /// </summary>
     private void playerGroundCheck()
     {
-        isGround = false;
-        doubleJumpTimerOn = true;
-
-        if (gravityVelocity > 0.0f)
+        if (gravityVelocity < 0)
         {
-            return;
+            isGround = Physics2D.BoxCast(playerBoxColl.bounds.center, playerBoxColl.bounds.size,
+                       0.0f, Vector2.down, 0.1f, LayerMask.GetMask("Ground")); //플레이어의 박스 콜라이더 크기만큼의 레이캐스트를 가짐
+        }
+        else if (gravityVelocity > 0)
+        {
+            isGround = false;
+            doubleJumpTimerOn = true;
         }
 
-        hit2D = Physics2D.BoxCast(playerBoxColl.bounds.center, playerBoxColl.bounds.size, 
-            0.0f, Vector2.down, 0.1f, LayerMask.GetMask("Ground")); //플레이어의 박스 콜라이더 크기만큼의 레이캐스트를 가짐
-
-        if (hit2D.transform != null &&
-            hit2D.transform.gameObject.layer == LayerMask.NameToLayer("Ground")) //캐스트에 닿은 트랜스폼이 null이 아니고, 레이어가 Ground면 작동
+        if (isGround == true) //박스케스트에 닿은 오브젝트가 Ground레이어면 땅 체크 
         {
-            isGround = true; //박스케스트에 닿은 오브젝트가 Ground레이어면 땅 체크 
             isJump = false; //박스케스트에 닿은 오브젝트가 Ground레이어면 점프 체크 
             isDoubleJump = false; //박스케스트에 닿은 오브젝트가 Ground레이어면 더블점프 체크 
             doubleJumpTimerOn = false; //박스케스트에 닿은 오브젝트가 Ground레이어면 더블점프 타이머 체크 
@@ -226,7 +224,7 @@ public class Player : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.LeftArrow))
         {
-            moveVec.x = -playerMoveSpeed;
+            moveVec.x = -moveSpeed;
             if (moveVec.x < 0.0f && transform.localScale.x < 0.0f)
             {
                 Vector3 scale = transform.localScale;
@@ -236,7 +234,7 @@ public class Player : MonoBehaviour
         }
         else if (Input.GetKey(KeyCode.RightArrow))
         {
-            moveVec.x = playerMoveSpeed;
+            moveVec.x = moveSpeed;
             if (moveVec.x > 0.0f && transform.localScale.x > 0.0f)
             {
                 Vector3 scale = transform.localScale;
@@ -266,14 +264,14 @@ public class Player : MonoBehaviour
         {
             if (isGround == true && isJump == false)
             {
-                gravityVelocity = playerJumpPower;
+                gravityVelocity = jumpPower;
                 doubleJumpTimerOn = true;
                 jumpAnim = true;
                 isDrop = false;
             }
             else if (isGround == false && isJump == false && isDoubleJump == true)
             {
-                gravityVelocity = playerJumpPower;
+                gravityVelocity = jumpPower;
                 isJump = true;
                 isDoubleJump = false;
                 jumpAnim = true;
@@ -304,11 +302,11 @@ public class Player : MonoBehaviour
 
             if (transform.localScale.x < 0)
             {
-                rigid.velocity = new Vector3(playerDashPower, 0.0f, 0.0f);
+                rigid.velocity = new Vector3(dashPower, 0.0f, 0.0f);
             }
             else if (transform.localScale.x > 0)
             {
-                rigid.velocity = new Vector3(-playerDashPower, 0.0f, 0.0f);
+                rigid.velocity = new Vector3(-dashPower, 0.0f, 0.0f);
             }
 
             dashCoolTimerOn = true;
@@ -407,7 +405,7 @@ public class Player : MonoBehaviour
         }
 
         if (isPersonality == true && personalityChangeOff == false)
-        {         
+        {
             if (randomPersonality == 0 && james.activeSelf == false)
             {
                 henry.SetActive(false);

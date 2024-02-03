@@ -130,13 +130,13 @@ MonoBehaviour:
   changeTypeMax: 300
   changeTimerStop: 0
   personalityChangeTimer: 0
-  personalityDelay: 2
-  personalityInvincibilityTimer: 3
+  personalityDelay: 1.5
+  InvincibilityTime: 0
   gravity: 12
-  playerMoveSpeed: 4
-  playerJumpPower: 8
-  playerDashPower: 10
-  playerDashCoolTime: 1
+  moveSpeed: 5
+  jumpPower: 7.5
+  dashPower: 10
+  dashCoolTime: 1
   dashDuration: 0.2
   jamesDamage: 0
   henryDamage: 0
