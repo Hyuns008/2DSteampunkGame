@@ -26,6 +26,56 @@ public class Monster : MonoBehaviour
     private float idleTimer; //제자리에 멈춰줄 타이머
     private bool idleOn = false; //제자리에 있게 해줄 변수
 
+    [Header("체크 콜라이더 설정")]
+    [SerializeField] private CircleCollider2D checkColl;
+    private bool playerTracking = false; //플레이어를 추적하는지 체크하기 위한 변수
+    private bool attackStop = false; //몬스터가 공격할 때 멈추게 해주는 변수
+
+    private void onTriggerCheck(Collider2D collision)
+    {
+        if (attackStop == true)
+        {
+            moveVec.x = 0f;
+            rigid.velocity = moveVec;
+            return;
+        }
+
+        if (collision.gameObject.layer == LayerMask.NameToLayer("Player"))
+        {
+            playerTracking = true;
+
+            Vector3 playerPos = collision.transform.position - transform.position;
+
+            if (playerPos.x < -1 && transform.localScale.x < 0)
+            {
+                moveSpeed *= -1;
+
+                Vector3 scale = transform.localScale;
+                scale.x *= -1f;
+                transform.localScale = scale;
+
+                moveVec.x = moveSpeed;
+            }
+            else if (playerPos.x > 1 && transform.localScale.x > 0)
+            {
+                moveSpeed *= -1;
+
+                Vector3 scale = transform.localScale;
+                scale.x *= -1f;
+                transform.localScale = scale;
+
+                moveVec.x = moveSpeed;
+            }
+            else if(playerPos.x >= -1 && playerPos.x <= 1)
+            {
+                moveVec.x = 0f;
+            }
+
+            moveVec.y = rigid.velocity.y;
+            rigid.velocity = moveVec;
+        }
+    }
+
     private void Awake()
     {
         rigid = GetComponent<Rigidbody2D>();
@@ -36,8 +86,33 @@ public class Monster : MonoBehaviour
 
     private void Update()
     {
+        playerCollCheck();
+
+        if (playerTracking == true || attackStop == true)
+        {
+            return;
+        }
+
         monsterTimers();
         monsterMove();
+    }
+
+    /// <summary>
+    /// 플레이어를 체크하기 위한 함수
+    /// </summary>
+    private void playerCollCheck()
+    {
+        Collider2D playerColl = Physics2D.OverlapBox(checkColl.bounds.center,
+                     checkColl.bounds.size, 0, LayerMask.GetMask("Player"));
+
+        if (playerColl != null)
+        {
+            onTriggerCheck(playerColl);
+        }
+        else
+        {
+            playerTracking = false;
+        }
     }
 
     /// <summary>
@@ -76,7 +151,7 @@ public class Monster : MonoBehaviour
     /// </summary>
     private void monsterMove()
     {
-        if (moveOff == true || idleOn == true)
+        if (moveOff == true || idleOn == true || attackStop == true)
         {
             moveVec.x = 0f;
             rigid.velocity = moveVec;
@@ -129,5 +204,10 @@ public class Monster : MonoBehaviour
     public Vector3 MoveVecReturn()
     {
         return moveVec;
+    }
+
+    public void SetAttackStop(bool _attackstop)
+    {
+        attackStop = _attackstop;
     }
 }

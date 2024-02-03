@@ -8,6 +8,9 @@ public class Player : MonoBehaviour
     public class PlayerData //플레이어 데이터를 저장하기 위한 클래스
     {
         private int personality;
+        private float personalityChangeTimer;
+        private float maxHp;
+        private float curHp;
     }
 
     [Header("캐릭터 인격 설정")]
@@ -17,6 +20,7 @@ public class Player : MonoBehaviour
     [SerializeField, Tooltip("제임스")] private GameObject james;
     [SerializeField, Tooltip("헨리")] private GameObject henry;
     [SerializeField, Tooltip("로렌")] private GameObject lauren;
+    private SpriteRenderer[] sprRen = new SpriteRenderer[3];
     [Space]
     [SerializeField, Tooltip("인격 변경 시간 최소")] private float changeTypeMin;
     [SerializeField, Tooltip("인격 변경 시간 최대")] private float changeTypeMax;
@@ -30,7 +34,7 @@ public class Player : MonoBehaviour
     private bool personalityChangeOff = false;
     private float personalityDelayTimer; //인격 변경을 위한 딜레이 타이머
     private bool useCnagePersonality = false;
-    [SerializeField, Tooltip("인격을 변경 중 무적 시간")] private float InvincibilityTime; //인격 변경 시 무적 시간
+    [SerializeField, Tooltip("인격을 변경 중 무적 시간")] private float personalityInviTime; //인격 변경 시 무적 시간
 
     private Animator animJames; //제임스의 애니메이션
     private Animator animHenry; //헨리의 애니메이션
@@ -45,6 +49,10 @@ public class Player : MonoBehaviour
     [SerializeField, Tooltip("플레이어의 중력")] private float gravity;
     private float gravityVelocity; //y값을 이용할 변수
     private bool isGround; //땅을 체크하기 위한 변수
+
+    [Header("플레이어 체력 설정")]
+    [SerializeField, Tooltip("플레이어의 최대체력")] private float maxHp;
+    [SerializeField, Tooltip("플레이어의 현재체력")] private float curHp;
 
     [Header("플레이어 이동속도 설정")]
     [SerializeField, Tooltip("플레이어의 이동속도")] private float moveSpeed;
@@ -68,6 +76,12 @@ public class Player : MonoBehaviour
     [SerializeField, Tooltip("대쉬가 지속되는 시간")] private float dashDuration;
     private bool dashDurationTimerOn; //대쉬가 지속되는 타이머를 실행시켜주는 변수
     private float dashDurationTimer; //대쉬가 지속되는 타이머
+    private bool dashInvi = false; //대쉬 중 무적을 체크해주는 변수
+
+    [Header("플레이어 히트 설정")]
+    [SerializeField, Tooltip("맞을 시 다시 맞는 딜레이 시간")] private float hitTime;
+    private float hitDelayTimer; //다시 맞기 위해 작동되는 타이머
+    private bool isHit; //맞았는지 체크해주기 위한 변수
 
     [Header("제임스 기본 설정")]
     [SerializeField, Tooltip("제임스의 공격력")] private float jamesDamage;
@@ -84,6 +98,7 @@ public class Player : MonoBehaviour
         playerBoxColl = GetComponent<BoxCollider2D>();
 
         personalityChangeTimer = 300.0f;
+        curHp = maxHp;
         dashCoolTimer = dashCoolTime;
     }
 
@@ -92,6 +107,28 @@ public class Player : MonoBehaviour
         animJames = james.GetComponent<Animator>();
         animHenry = henry.GetComponent<Animator>();
         animLauren = lauren.GetComponent<Animator>();
+        sprRen[0] = james.GetComponent<SpriteRenderer>();
+        sprRen[1] = henry.GetComponent<SpriteRenderer>();
+        sprRen[2] = lauren.GetComponent<SpriteRenderer>();
+
+        if (personality == 0)
+        {
+            henry.SetActive(false);
+            lauren.SetActive(false);
+            james.SetActive(true);
+        }
+        else if (personality == 1)
+        {
+            james.SetActive(false);
+            lauren.SetActive(false);
+            henry.SetActive(true);
+        }
+        else if (personality == 2)
+        {
+            james.SetActive(false);
+            henry.SetActive(false);
+            lauren.SetActive(true);
+        }
     }
 
     private void Update()
@@ -159,6 +196,7 @@ public class Player : MonoBehaviour
             if (dashDurationTimer >= dashDuration)
             {
                 isDash = false;
+                dashInvi = false;
                 dashDurationTimer = 0.0f;
                 dashDurationTimerOn = false;
             }
@@ -171,6 +209,29 @@ public class Player : MonoBehaviour
             {
                 jumpAnim = false;
                 dropTimer = 0f;
+            }
+        }
+
+        if (isHit == true)
+        {
+            hitDelayTimer += Time.deltaTime;
+            if (hitDelayTimer >= hitTime)
+            {
+                if (james.activeSelf == true)
+                {
+                    sprRen[0].color = Color.white;
+                }
+                else if (henry.activeSelf == true)
+                {
+                    sprRen[1].color = Color.white;
+                }
+                else if (lauren.activeSelf == true)
+                {
+                    sprRen[2].color = Color.white;
+                }
+
+                hitDelayTimer = 0f;
+                isHit = false;
             }
         }
     }
@@ -293,6 +354,8 @@ public class Player : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.LeftShift) && dashCoolTimerOn == false)
         {
             isDash = true;
+
+            dashInvi = true;
 
             isDrop = false;
 
@@ -444,6 +507,7 @@ public class Player : MonoBehaviour
                 henry.SetActive(false);
                 lauren.SetActive(false);
                 james.SetActive(true);
+                sprRen[0].color = Color.white;
             }
             else if (personality == 1)
             {
@@ -455,6 +519,7 @@ public class Player : MonoBehaviour
                 james.SetActive(false);
                 lauren.SetActive(false);
                 henry.SetActive(true);
+                sprRen[1].color = Color.white;
             }
             else if (personality == 2)
             {
@@ -466,6 +531,7 @@ public class Player : MonoBehaviour
                 henry.SetActive(false);
                 james.SetActive(false);
                 lauren.SetActive(true);
+                sprRen[2].color = Color.white;
             }
         }
     }
@@ -504,6 +570,59 @@ public class Player : MonoBehaviour
             animLauren.SetBool("isDash", isDash);
             animLauren.SetBool("isDrop", isDrop);
             animLauren.SetBool("isChage", isPersonality);
+        }
+    }
+
+    /// <summary>
+    /// 플레이어가 맞는걸 외부 스크립트에서 체크해주는 함수
+    /// </summary>
+    public void PlayerHit(float _damge, bool _isHit, bool _isFire)
+    {
+        if (dashInvi == false && isHit == false)
+        {
+            isHit = _isHit;
+
+            if (james.activeSelf == true)
+            {
+                if (_isFire == true)
+                {
+                    sprRen[0].color = Color.red;
+                }
+                else if (_isFire == false)
+                {
+
+                }
+
+                animJames.SetTrigger("isHit");
+            }
+            else if (henry.activeSelf == true)
+            {
+                if (_isFire == true)
+                {
+                    sprRen[1].color = Color.red;
+                }
+                else if (_isFire == false)
+                {
+
+                }
+
+                animHenry.SetTrigger("isHit");
+            }
+            else if (lauren.activeSelf == true)
+            {
+                if (_isFire == true)
+                {
+                    sprRen[2].color = Color.red;
+                }
+                else if (_isFire == false)
+                {
+
+                }
+
+                animLauren.SetTrigger("isHit");
+            }
+
+            curHp -= _damge;
         }
     }
 }

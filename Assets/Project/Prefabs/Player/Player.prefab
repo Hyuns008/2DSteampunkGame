@@ -35,7 +35,7 @@ Transform:
   - {fileID: 5788732427371770593}
   - {fileID: 7706823711227781594}
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!61 &173037271011116777
 BoxCollider2D:
@@ -131,13 +131,16 @@ MonoBehaviour:
   changeTimerStop: 0
   personalityChangeTimer: 0
   personalityDelay: 1.5
-  InvincibilityTime: 0
+  personalityInviTime: 0
   gravity: 12
+  maxHp: 10
+  curHp: 0
   moveSpeed: 5
   jumpPower: 7.5
   dashPower: 10
   dashCoolTime: 1
   dashDuration: 0.2
+  hitTime: 0.5
   jamesDamage: 0
   henryDamage: 0
   laurenDamage: 0
@@ -264,7 +267,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &7706823711227781594
 Transform:
   m_ObjectHideFlags: 0
@@ -370,7 +373,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5788732427371770593
 Transform:
   m_ObjectHideFlags: 0
